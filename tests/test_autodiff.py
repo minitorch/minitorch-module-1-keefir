@@ -103,7 +103,7 @@ def test_chain_rule4() -> None:
 
 @pytest.mark.task1_4
 def test_backprop1() -> None:
-    # Example 1: F1(0, v)
+    # Example 1: F1(0, v) = 0 + v + 10
     var = minitorch.Scalar(0)
     var2 = Function1.apply(0, var)
     var2.backward(d_output=5)

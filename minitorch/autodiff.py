@@ -3,6 +3,7 @@ from typing import Any, Iterable, List, Tuple
 
 from typing_extensions import Protocol
 
+
 # ## Task 1.1
 # Central Difference calculation
 
@@ -23,7 +24,10 @@ def central_difference(f: Any, *vals: Any, arg: int = 0, epsilon: float = 1e-6) 
         An approximation of $f'_i(x_0, \ldots, x_{n-1})$
     """
     # TODO: Implement for Task 1.1.
-    raise NotImplementedError("Need to implement for Task 1.1")
+    eps_vector = [0 for _ in range(len(vals))]
+    eps_vector[arg] = epsilon
+    sum_vector = [vals[i] + eps_vector[i] for i in range(len(eps_vector))]
+    return (f(*sum_vector) - f(*vals)) / epsilon
 
 
 variable_count = 1
@@ -62,7 +66,23 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
         Non-constant Variables in topological order starting from the right.
     """
     # TODO: Implement for Task 1.4.
-    raise NotImplementedError("Need to implement for Task 1.4")
+    visited = set()
+    sorted_graph = []
+
+    def dfs(v: Variable):
+        if v in visited:
+            return
+        visited.add(v)
+
+        for parent in v.parents:
+            if not parent.is_constant():
+                dfs(parent)
+        sorted_graph.append(v)
+
+    dfs(variable)
+    sorted_graph = sorted_graph[::-1]
+
+    return sorted_graph
 
 
 def backpropagate(variable: Variable, deriv: Any) -> None:
@@ -77,7 +97,22 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
     No return. Should write to its results to the derivative values of each leaf through `accumulate_derivative`.
     """
     # TODO: Implement for Task 1.4.
-    raise NotImplementedError("Need to implement for Task 1.4")
+    deque = [(variable, deriv)]
+
+    while len(deque) > 0:
+        curr_variable, curr_deriv = deque.pop()
+
+        if curr_variable.is_constant():
+            continue
+
+        if curr_variable.is_leaf():
+            curr_variable.accumulate_derivative(curr_deriv)
+            continue
+
+        pairs = curr_variable.chain_rule(curr_deriv)
+
+        for parent, derivative in pairs:
+            deque.append((parent, derivative))
 
 
 @dataclass
